@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+   <h:head>
+      <title>Home Page</title>
+       <h:outputStylesheet library="css" name="cabinet_home.css"/>
+   </h:head>
+   <h:body>
+      <h:outputText value="Hello, #{customer.currentUser.name}"/>
+       <div class="search">
+           <table>
+               <h:form id="searchGrid">
+                   <tr><td><h:outputText value="Список документов"/></td></tr>
+                   <tr>
+                       <td><h:outputText value="Номер документа"/></td>
+                       <td>
+                           <p:inputText value="#{searchBean.number}">
+                               <f:validator validatorId="ru.homework.cabinet.validators.DocumentNumberValidator"/>
+                           </p:inputText>
+                       </td>
+                       <td><h:outputText value="Дата изменения с:"/></td>
+                       <td>
+                           <p:calendar value="#{searchBean.dateModifyStart}" showOn="button" />
+                       </td>
+                       <td><h:outputText value="по:"/></td>
+                       <td><p:calendar value="#{searchBean.dateModifyEnd}" showOn="button" requiredMessage="Заполните поля ввода: Дата изменения по:" /></td>
+                   </tr>
+                   <tr>
+                       <td><h:outputText value="Название"/></td>
+                       <td><p:inputText value="#{searchBean.name}"/></td>
+                       <td><h:outputText value="Дата создания с:"/></td>
+                       <td><p:calendar value="#{searchBean.dateCreateStart}" showOn="button" requiredMessage="Заполните поля ввода: Дата создания с:" /></td>
+                       <td><h:outputText value="по:"/></td>
+                       <td><p:calendar value="#{searchBean.dateCreateEnd}" showOn="button" requiredMessage="Заполните поля ввода: Дата создания по:"/></td>
+                   </tr>
+                   <tr>
+                       <td><h:outputText value="Тип документа"/></td>
+                       <td><p:inputText value="#{searchBean.type}"/></td>
+                   </tr>
+                   <tr>
+                       <td><p:commandButton value="Найти" action="#{searchBean.execute()}" update="resultTable"/></td>
+                       <td><p:commandButton value="Сбросить" type="reset" update="buttons, resultTable"/></td>
+                   </tr>
+               </h:form>
+           </table>
+       </div>
+          <div class="result" style="padding-bottom: 5px">
+
+                          <h:form id="buttons">
+                              <td><p:commandButton value="view" type="button" disabled="#{!customer.isSingleSelected()}"
+                                                   onclick="PF('viewDoc').show();" update="resultTable,view,delete,add,edit"/></td>
+                              <td><p:commandButton value="add" type="button" onclick="PF('addDoc').show();" update="resultTable,view,delete,add,edit"/></td>
+                              <td><p:commandButton value="edit" type="button" disabled="#{!customer.isSingleSelected()}"
+                                                   onclick="PF('editDoc').show();" update="resultTable,view,delete,add,edit"/></td>
+                              <td><p:commandButton value="delete" onclick="PF('deleteDoc').show()"
+                                                   disabled="#{!customer.isManySelected()}" update="resultTable,view,delete,add,edit"/></td>
+                          </h:form>
+
+
+                  <p:dialog header="Добавление документа" widgetVar="addDoc">
+                      <h:form id="add">
+                        <table>
+                            <tr>
+                                <td><h:outputText value="Номер документа"/></td>
+                                <td>
+                                    <p:inputText id="newDocNumber" value="#{documentBean.number}">
+                                            <f:validator validatorId="ru.homework.cabinet.validators.DocumentNumberValidator"/>
+                                    </p:inputText>
+                                    <p:growl for="newDocNumber" autoUpdate="true"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="Название документа"/></td>
+                                <td>
+                                    <p:inputText id="newDocName" value="#{documentBean.name}">
+                                        <f:validator validatorId="ru.homework.cabinet.validators.DocumentNameValidator"/>
+                                    </p:inputText>
+                                    <h:message for="newDocName"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="Тип документа"/></td>
+                                <td>
+                                    <p:inputText id="newDocType" value="#{documentBean.type}">
+                                        <f:validator validatorId="ru.homework.cabinet.validators.DocumentTypeValidator"/>
+                                    </p:inputText>
+                                    <h:message for="newDocType"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><p:commandButton value="Добавить" action="#{documentBean.createDocument}" update="resultTable,add"/></td>
+                                <td><p:commandButton value="Отменить" onclick="PF('addDoc').hide();"/></td>
+                            </tr>
+                        </table>
+                      </h:form>
+                  </p:dialog>
+                  <p:dialog header="Изменение документа" widgetVar="editDoc">
+                      <h:form id="edit">
+                          <table>
+                              <tr>
+                                  <td><h:outputText value="Номер документа"/></td>
+                                  <td>
+                                      <p:inputText id="editNumber" value="#{documentBean.number}">
+                                        <f:validator validatorId="ru.homework.cabinet.validators.DocumentNumberValidator"/>
+                                      </p:inputText>
+                                      <h:message for="editNumber"/>
+                                      <p:watermark value="#{customer.getSelectedDocument().number}" for="editNumber"/>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td><h:outputText value="Название документа"/></td>
+                                  <td>
+                                      <p:inputText id="editName" value="#{documentBean.name}">
+                                        <f:validator validatorId="ru.homework.cabinet.validators.DocumentNameValidator"/>
+                                      </p:inputText>
+                                      <h:message for="editName"/>
+                                      <p:watermark value="#{customer.getSelectedDocument().name}" for="editName"/>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td><h:outputText value="Тип документа"/></td>
+                                  <td>
+                                      <p:inputText id="editType" value="#{documentBean.type}">
+                                        <f:validator validatorId="ru.homework.cabinet.validators.DocumentTypeValidator"/>
+                                      </p:inputText>
+                                      <h:message for="editType"/>
+                                      <p:watermark value="#{customer.getSelectedDocument().type}" for="editType"/>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td><p:commandButton value="Изменить" action="#{documentBean.editDocument}" update="resultTable,buttons"/></td>
+                                  <td><p:commandButton value="Отменить" onclick="PF('editDoc').hide();"/></td>
+                              </tr>
+                          </table>
+                      </h:form>
+                  </p:dialog>
+                  <p:dialog header="Просмотр документа" widgetVar="viewDoc">
+                      <h:form id="view">
+                          <table>
+                              <tr>
+                                  <td><h:outputText value="Номер документа"/></td>
+                                  <td><h:outputText value="#{customer.getSelectedDocument().number}"/></td>
+                              </tr>
+                              <tr>
+                                  <td><h:outputText value="Название документа"/></td>
+                                  <td><h:outputText value="#{customer.getSelectedDocument().name}"/></td>
+                              </tr>
+                              <tr>
+                                  <td><h:outputText value="Тип документа"/></td>
+                                  <td><h:outputText value="#{customer.getSelectedDocument().type}"/></td>
+                              </tr>
+                              <tr>
+                                  <td><h:outputText value="Дата создания"/></td>
+                                  <td><h:outputText value="#{customer.getSelectedDocument().dateCreate}"/></td>
+                              </tr>
+                              <tr>
+                                  <td><h:outputText value="Дата Изменения документа"/></td>
+                                  <td><h:outputText value="#{customer.getSelectedDocument().dateModify}"/></td>
+                              </tr>
+                              <tr>
+                                  <td><p:commandButton value="Закрыть" onclick="PF('viewDoc').hide();"/></td>
+                              </tr>
+                          </table>
+                      </h:form>
+                  </p:dialog>
+                  <p:dialog header="Удаление документа" widgetVar="deleteDoc">
+                  <h:form id="delete">
+                      <table>
+                          <tr>
+                              <td>Удалить?</td>
+                          </tr>
+                          <tr>
+                              <td><p:commandButton value="Да" update="resultTable,buttons" action="#{customer.deleteDocuments}" onclick="PF('deleteDoc').hide();"/></td>
+                              <td><p:commandButton value="Отменить" onclick="PF('deleteDoc').hide();"/></td>
+                          </tr>
+                      </table>
+                  </h:form>
+                  </p:dialog>
+
+                  <h:form id="resultTable">
+                      <p:dataTable var="doc"
+                                   value="#{customer.currentList}"
+                                   paginator="true"
+                                   rowSelectMode="checkbox"
+                                   rows="3"
+                                   paginatorTemplate="{RowsPerPageDropdown} {PreviousPageLink} {NextPageLink}"
+                                   rowsPerPageTemplate="3,5,10"
+                                   selection="#{customer.selectedDocuments}"
+                                   rowKey="#{doc.id}">
+                          <p:ajax event="rowSelectCheckbox" update="buttons,view,edit"/>
+                          <p:ajax event="rowSelectCheckbox" update="buttons,view,edit"/>
+                          <p:ajax event="rowSelectCheckbox" update="buttons,view,edit"/>
+                          <p:ajax event="rowUnselectCheckbox" update="buttons,view,edit"/>
+                          <p:ajax event="rowUnselectCheckbox" update="buttons,view,edit"/>
+                          <p:ajax event="rowUnselectCheckbox" update="buttons,view,edit"/>
+                          <p:ajax event="toggleSelect" update="buttons,view,edit"/>
+                          <p:column selectionMode="multiple" id="check">
+
+                          </p:column>
+                          <p:column headerText="Номер документа" sortBy="#{doc.number}">
+                              <h:outputText value="#{doc.number}"/>
+                          </p:column>
+
+                          <p:column headerText="Название документа" sortBy="#{doc.name}">
+                              <h:outputText value="#{doc.name}"/>
+                          </p:column>
+
+                          <p:column headerText="тип документа" sortBy="#{doc.type}">
+                              <h:outputText value="#{doc.type}"/>
+                          </p:column>
+
+                          <p:column headerText="Дата создания" sortBy="#{doc.dateCreate}">
+                              <h:outputText value="#{doc.dateCreate}"/>
+                          </p:column>
+
+                          <p:column headerText="Дата изменения" sortBy="#{doc.dateModify}">
+                              <h:outputText value="#{doc.dateModify}"/>
+                          </p:column>
+                      </p:dataTable>
+                  </h:form>
+          </div>
+   </h:body>
+</html>

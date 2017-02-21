@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>login</title>
+    <h:outputStylesheet library="css" name="cabinet_login.css"/>
+</h:head>
+<h:body>
+
+    <div class="login">
+        <h:form>
+            <h3>Вход:</h3>
+            <table>
+                <tr>
+                    <td><h:outputText value="User name:"/></td>
+                    <td>
+                        <p:inputText id="username" value="#{login.name}" required="true" requiredMessage="Введите логин">
+                            <f:validator validatorId="ru.homework.cabinet.validators.UserNameValidator"/>
+                        </p:inputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="Password:" /></td>
+                    <td>
+                        <p:password id="password" value="#{login.psw}" required="true" requiredMessage="Введите пароль">
+                            <f:validator validatorId="ru.homework.cabinet.validators.UserPasswordValidator"/>
+                        </p:password>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h:commandButton action="#{login.validate()}" value="Login"/>
+                    </td>
+                </tr>
+                <tr><td></td><td><h:message for="username"/></td></tr>
+                <tr><td></td><td><h:message for="password"/></td></tr>
+            </table>
+        </h:form>
+    </div>
+</h:body>
+</html>
